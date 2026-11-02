@@ -3,23 +3,29 @@ is_running = True
 tasks = []
 
 
-def ask_task_number(tasks, prompt):
+def ask_task_number(task_list, prompt):
     """Спрашивает номер задачи. Возвращает индекс или None, если ввод неверный."""
     try:
         index = int(input(prompt))
     except ValueError:
-        print()
         print("Некорректный ввод. Нужно ввести число.")
         return None
-    if index < 1 or index > len(tasks):
-        print()
+    if index < 1 or index > len(task_list):
         print(f"Задача с номером {index} не найдена.")
         return None
     return index - 1
 
+def add_task(task_list):
+    """Добавляет задачу в список."""
+    title = input("Введите название задачи: ").strip()
+    if not title:
+        print("Название задачи не может быть пустым.")
+    else:
+        task_list.append({"title": title, "is_done": False})
+        print(f"Задача '{title}' добавлена под номером {len(task_list)}.")
+
 
 while is_running:
-    print()
     print("=== ПРОСТОЙ TO DO ===\n")
     print("1. Добавить задачу")
     print("2. Отметить задачу как выполненную")
@@ -32,18 +38,9 @@ while is_running:
     choice = input("Выберите действие: ")
 
     if choice == "1":
-        title = input("Введите название задачи: ").strip()
-        if not title:
-            print()
-            print("Название задачи не может быть пустым.")
-        else:
-            print()
-            tasks.append({"title": title, "is_done": False})
-            print(f"Задача '{title}' добавлена под номером {len(tasks)}.")
-
+        add_task(tasks)
 
     elif choice == "2":
-        print()
         if not tasks:
             print("Список задач пуст.")
         else:
@@ -53,26 +50,21 @@ while is_running:
             if index is not None:
                 task = tasks[index]
                 if task["is_done"]:
-                    print()
                     print(f"Задача '{task['title']}' уже выполнена.")
                 else:
                     task["is_done"] = True
-                    print()
                     print(f"Задача '{task['title']}' отмечена как выполненная.")
 
     elif choice == "3":
-        print()
         if not tasks:
             print("Список задач пуст.")
         else:
             index = ask_task_number(tasks, "Введите номер задачи для удаления: ")
             if index is not None:
                 removed_task = tasks.pop(index)
-                print()
                 print(f"Задача '{removed_task['title']}' удалена.")
 
     elif choice == "4":
-        print()
         if not tasks:
             print("Список задач пуст.")
         else:
@@ -83,7 +75,6 @@ while is_running:
                 )
 
     elif choice == "5":
-        print()
         if not tasks or not any(task["is_done"] for task in tasks):
             print("Список выполненных задач пуст.")
         else:
@@ -93,7 +84,6 @@ while is_running:
                     print(f"{index}. {task['title']}")
 
     elif choice == "6":
-        print()
         if not tasks or not any(not task["is_done"] for task in tasks):
             print("Список невыполненных задач пуст.")
         else:
@@ -107,5 +97,4 @@ while is_running:
         is_running = False
 
     else:
-        print()
         print("Неизвестный пункт меню, выберите от 1 до 7.")
