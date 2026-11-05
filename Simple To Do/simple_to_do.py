@@ -6,14 +6,14 @@ tasks = []
 def ask_task_number(task_list, prompt):
     """Спрашивает номер задачи. Возвращает индекс или None, если ввод неверный."""
     try:
-        index = int(input(prompt))
+        task_index = int(input(prompt))
     except ValueError:
         print("Некорректный ввод. Нужно ввести число.")
         return None
-    if index < 1 or index > len(task_list):
-        print(f"Задача с номером {index} не найдена.")
+    if task_index < 1 or task_index > len(task_list):
+        print(f"Задача с номером {task_index} не найдена.")
         return None
-    return index - 1
+    return task_index - 1
 
 def add_task(task_list):
     """Добавляет задачу в список."""
