@@ -4,6 +4,7 @@ from enum import Enum
 from rich.table import Table
 from rich.console import Console
 from rich import box
+from rich.markup import escape
 
 
 class Action(Enum):
@@ -65,7 +66,7 @@ def add_task(task_list):
         console.print("[red]Название задачи не может быть пустым.[/red]")
     else:
         task_list.append({"title": title, "is_done": False})
-        console.print(f"[green]Задача '{title}' добавлена под номером {len(task_list)}.[/green]")
+        console.print(f"[green]Задача '{escape(title)}' добавлена под номером {len(task_list)}.[/green]")
 
 
 def show_tasks(task_list, filter_done=None):
@@ -85,7 +86,7 @@ def show_tasks(task_list, filter_done=None):
     for task_number, current_task in enumerate(task_list, start=1):
         if filter_done is None or current_task["is_done"] == filter_done:
             status = "[green]☑[/green]" if current_task["is_done"] else "[yellow]☐[/yellow]"
-            table.add_row(str(task_number), current_task["title"], status)
+            table.add_row(str(task_number), escape(current_task["title"]), status)
 
     console.print(table)
 
@@ -109,11 +110,11 @@ while is_running:
 
         task = tasks[index]
         if task["is_done"]:
-            console.print(f"[yellow]Задача '{task['title']}' уже выполнена.[/yellow]")
+            console.print(f"[yellow]Задача '{escape(task['title'])}' уже выполнена.[/yellow]")
             continue
 
         task["is_done"] = True
-        console.print(f"[green]Задача '{task['title']}' отмечена как выполненная.[/green]")
+        console.print(f"[green]Задача '{escape(task['title'])}' отмечена как выполненная.[/green]")
 
     elif choice == Action.DELETE_TASK:
         if not tasks:
@@ -123,7 +124,7 @@ while is_running:
         index = ask_task_number(tasks, "Введите номер задачи для удаления: ")
         if index is not None:
             removed_task = tasks.pop(index)
-            console.print(f"[green]Задача '{removed_task['title']}' удалена.[/green]")
+            console.print(f"[green]Задача '{escape(removed_task['title'])}' удалена.[/green]")
 
     elif choice == Action.SHOW_ALL_TASKS:
         if not tasks:
