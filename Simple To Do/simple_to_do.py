@@ -34,7 +34,7 @@ console = Console()
 
 
 def show_menu():
-    """Показывает интерактивное меню и возвращает выбранное действие."""
+    """Показывает интерактивное меню и возвращает выбранное действие. При Ctrl+C возвращает None."""
     choices = [
         Choice(title=label, value=action)
         for action, label in ACTION_LABELS.items()
@@ -60,7 +60,6 @@ def ask_task_number(task_list, prompt):
 
 
 def add_task(task_list):
-    """Добавляет задачу в список."""
     title = input("Введите название задачи: ").strip()
     if not title:
         console.print("[red]Название задачи не может быть пустым.[/red]")
@@ -70,7 +69,7 @@ def add_task(task_list):
 
 
 def show_tasks(task_list, filter_done=None):
-    """Показывает задачи в виде таблицы. Можно фильтровать по выполненным/невыполненным."""
+    """Нумерация до фильтрации, чтобы сохранить правильные номера задач для пользователя."""
     table = Table(
         title="Список задач",
         border_style="blue",
