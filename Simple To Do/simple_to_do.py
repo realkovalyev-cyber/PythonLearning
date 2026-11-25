@@ -111,40 +111,42 @@ while is_running:
         task = tasks[index]
         if task["is_done"]:
             console.print(f"[yellow]Задача '{task['title']}' уже выполнена.[/yellow]")
-        else:
-            task["is_done"] = True
-            console.print(f"[green]Задача '{task['title']}' отмечена как выполненная.[/green]")
+            continue
+
+        task["is_done"] = True
+        console.print(f"[green]Задача '{task['title']}' отмечена как выполненная.[/green]")
 
     elif choice == Action.DELETE_TASK:
         if not tasks:
             console.print("[red]Список задач пуст.[/red]")
             continue
-        else:
-            index = ask_task_number(tasks, "Введите номер задачи для удаления: ")
-            if index is not None:
-                removed_task = tasks.pop(index)
-                console.print(f"[green]Задача '{removed_task['title']}' удалена.[/green]")
+
+        index = ask_task_number(tasks, "Введите номер задачи для удаления: ")
+        if index is not None:
+            removed_task = tasks.pop(index)
+            console.print(f"[green]Задача '{removed_task['title']}' удалена.[/green]")
 
     elif choice == Action.SHOW_ALL_TASKS:
         if not tasks:
             console.print("[red]Список задач пуст.[/red]")
             continue
-        else:
-            show_tasks(tasks)
+
+
+        show_tasks(tasks)
 
     elif choice == Action.SHOW_DONE_TASKS:
-        if not tasks or not any(task["is_done"] for task in tasks):
+        if not any(task["is_done"] for task in tasks):
             console.print("[red]Список выполненных задач пуст.[/red]")
             continue
-        else:
-            show_tasks(tasks, filter_done=True)
+
+        show_tasks(tasks, filter_done=True)
 
     elif choice == Action.SHOW_NOT_DONE_TASKS:
-        if not tasks or not any(not task["is_done"] for task in tasks):
+        if not any(not task["is_done"] for task in tasks):
             console.print("[red]Список невыполненных задач пуст.[/red]")
             continue
-        else:
-            show_tasks(tasks, filter_done=False)
+
+        show_tasks(tasks, filter_done=False)
 
     elif choice == Action.EXIT:
         console.print("[green]Выход из программы.[/green]")
