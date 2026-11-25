@@ -91,66 +91,70 @@ def show_tasks(task_list, filter_done=None):
     console.print(table)
 
 
-while is_running:
-    choice = show_menu()
+try:
+    while is_running:
+        choice = show_menu()
 
-    if choice == Action.ADD_TASK:
-        add_task(tasks)
+        if choice == Action.ADD_TASK:
+            add_task(tasks)
 
-    elif choice == Action.MARK_DONE:
-        if not tasks:
-            console.print("[red]Список задач пуст.[/red]")
-            continue
+        elif choice == Action.MARK_DONE:
+            if not tasks:
+                console.print("[red]Список задач пуст.[/red]")
+                continue
 
-        index = ask_task_number(
-            tasks, "Введите номер задачи для отметки как выполненной: "
-        )
-        if index is None:
-            continue
+            index = ask_task_number(
+                tasks, "Введите номер задачи для отметки как выполненной: "
+            )
+            if index is None:
+                continue
 
-        task = tasks[index]
-        if task["is_done"]:
-            console.print(f"[yellow]Задача '{escape(task['title'])}' уже выполнена.[/yellow]")
-            continue
+            task = tasks[index]
+            if task["is_done"]:
+                console.print(f"[yellow]Задача '{escape(task['title'])}' уже выполнена.[/yellow]")
+                continue
 
-        task["is_done"] = True
-        console.print(f"[green]Задача '{escape(task['title'])}' отмечена как выполненная.[/green]")
+            task["is_done"] = True
+            console.print(f"[green]Задача '{escape(task['title'])}' отмечена как выполненная.[/green]")
 
-    elif choice == Action.DELETE_TASK:
-        if not tasks:
-            console.print("[red]Список задач пуст.[/red]")
-            continue
+        elif choice == Action.DELETE_TASK:
+            if not tasks:
+                console.print("[red]Список задач пуст.[/red]")
+                continue
 
-        index = ask_task_number(tasks, "Введите номер задачи для удаления: ")
-        if index is not None:
-            removed_task = tasks.pop(index)
-            console.print(f"[green]Задача '{escape(removed_task['title'])}' удалена.[/green]")
+            index = ask_task_number(tasks, "Введите номер задачи для удаления: ")
+            if index is not None:
+                removed_task = tasks.pop(index)
+                console.print(f"[green]Задача '{escape(removed_task['title'])}' удалена.[/green]")
 
-    elif choice == Action.SHOW_ALL_TASKS:
-        if not tasks:
-            console.print("[red]Список задач пуст.[/red]")
-            continue
+        elif choice == Action.SHOW_ALL_TASKS:
+            if not tasks:
+                console.print("[red]Список задач пуст.[/red]")
+                continue
 
-        show_tasks(tasks)
+            show_tasks(tasks)
 
-    elif choice == Action.SHOW_DONE_TASKS:
-        if not any(task["is_done"] for task in tasks):
-            console.print("[red]Список выполненных задач пуст.[/red]")
-            continue
+        elif choice == Action.SHOW_DONE_TASKS:
+            if not any(task["is_done"] for task in tasks):
+                console.print("[red]Список выполненных задач пуст.[/red]")
+                continue
 
-        show_tasks(tasks, filter_done=True)
+            show_tasks(tasks, filter_done=True)
 
-    elif choice == Action.SHOW_NOT_DONE_TASKS:
-        if not any(not task["is_done"] for task in tasks):
-            console.print("[red]Список невыполненных задач пуст.[/red]")
-            continue
+        elif choice == Action.SHOW_NOT_DONE_TASKS:
+            if not any(not task["is_done"] for task in tasks):
+                console.print("[red]Список невыполненных задач пуст.[/red]")
+                continue
 
-        show_tasks(tasks, filter_done=False)
+            show_tasks(tasks, filter_done=False)
 
-    elif choice == Action.EXIT:
-        console.print("[green]Выход из программы.[/green]")
-        is_running = False
+        elif choice == Action.EXIT:
+            console.print("[green]Выход из программы.[/green]")
+            is_running = False
 
-    elif choice is None:
-        console.print("[red]Отменено пользователем. Выход из программы.[/red]")
-        is_running = False
+        elif choice is None:
+            console.print("[red]Отменено пользователем. Выход из программы.[/red]")
+            is_running = False
+
+except KeyboardInterrupt:
+    console.print("[red]Программа завершена пользователем.[/red]")
