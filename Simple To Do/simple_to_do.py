@@ -34,7 +34,6 @@ console = Console()
 
 def show_menu():
     """Показывает интерактивное меню и возвращает выбранное действие."""
-
     choices = [
         Choice(title=label, value=action)
         for action, label in ACTION_LABELS.items()
@@ -131,7 +130,6 @@ while is_running:
             console.print("[red]Список задач пуст.[/red]")
             continue
 
-
         show_tasks(tasks)
 
     elif choice == Action.SHOW_DONE_TASKS:
@@ -150,4 +148,8 @@ while is_running:
 
     elif choice == Action.EXIT:
         console.print("[green]Выход из программы.[/green]")
+        is_running = False
+
+    elif choice is None:
+        console.print("[red]Отменено пользователем. Выход из программы.[/red]")
         is_running = False
