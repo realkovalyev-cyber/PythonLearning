@@ -1,4 +1,9 @@
+import questionary
+from questionary import Choice
 from enum import Enum
+from rich.table import Table
+from rich.console import Console
+from rich import box
 
 
 class Action(Enum):
@@ -24,49 +29,77 @@ ACTION_LABELS = {
 
 is_running = True
 tasks = [] 
+console = Console()
 
 
 def show_menu():
-    """Показывает меню действий."""
-    print("=== ПРОСТОЙ TO DO ===\n")
-    for action, label in ACTION_LABELS.items():
-        print(f"{action.value}. {label}")
-    print()
+    """Показывает интерактивное меню и возвращает выбранное действие."""
+
+    choices = [
+        Choice(title=label, value=action)
+        for action, label in ACTION_LABELS.items()
+    ]
+
+    return questionary.select(
+        "Выберите действие:",
+        choices=choices
+    ).ask()
 
 
 def ask_task_number(task_list, prompt):
     """Спрашивает номер задачи. Возвращает индекс или None, если ввод неверный."""
     try:
-        task_index = int(input(prompt))
+        task_number = int(input(prompt))
     except ValueError:
-        print("Некорректный ввод. Нужно ввести число.")
+        console.print("[red]Некорректный ввод. Нужно ввести число.[/red]")
         return None
-    if task_index < 1 or task_index > len(task_list):
-        print(f"Задача с номером {task_index} не найдена.")
+    if task_number < 1 or task_number > len(task_list):
+        console.print(f"[red]Задача с номером {task_number} не найдена.[/red]")
         return None
-    return task_index - 1
+    return task_number - 1
 
 
 def add_task(task_list):
     """Добавляет задачу в список."""
     title = input("Введите название задачи: ").strip()
     if not title:
-        print("Название задачи не может быть пустым.")
+        console.print("[red]Название задачи не может быть пустым.[/red]")
     else:
         task_list.append({"title": title, "is_done": False})
-        print(f"Задача '{title}' добавлена под номером {len(task_list)}.")
+        console.print(f"[green]Задача '{title}' добавлена под номером {len(task_list)}.[/green]")
+
+
+def show_tasks(task_list, filter_done=None):
+    """Показывает задачи в виде таблицы. Можно фильтровать по выполненным/невыполненным."""
+    table = Table(
+        title="Список задач",
+        border_style="blue",
+        show_header=True,
+        header_style="bold magenta",
+        box=box.ROUNDED
+    )
+
+    table.add_column("№", justify="center", style="cyan", no_wrap=True, min_width=3)
+    table.add_column("Название задачи", style="magenta", max_width=35)
+    table.add_column("Статус", justify="center")
+
+    for task_number, current_task in enumerate(task_list, start=1):
+        if filter_done is None or current_task["is_done"] == filter_done:
+            status = "[green]☑[/green]" if current_task["is_done"] else "[yellow]☐[/yellow]"
+            table.add_row(str(task_number), current_task["title"], status)
+
+    console.print(table)
 
 
 while is_running:
-    show_menu()
-    choice = input("Выберите действие: ")
+    choice = show_menu()
 
-    if choice == "1":
+    if choice == Action.ADD_TASK:
         add_task(tasks)
 
-    elif choice == "2":
+    elif choice == Action.MARK_DONE:
         if not tasks:
-            print("Список задач пуст.")
+            console.print("[red]Список задач пуст.[/red]")
             continue
 
         index = ask_task_number(
@@ -77,55 +110,42 @@ while is_running:
 
         task = tasks[index]
         if task["is_done"]:
-            print(f"Задача '{task['title']}' уже выполнена.")
+            console.print(f"[yellow]Задача '{task['title']}' уже выполнена.[/yellow]")
         else:
             task["is_done"] = True
-            print(f"Задача '{task['title']}' отмечена как выполненная.")
+            console.print(f"[green]Задача '{task['title']}' отмечена как выполненная.[/green]")
 
-    elif choice == "3":
+    elif choice == Action.DELETE_TASK:
         if not tasks:
-            print("Список задач пуст.")
+            console.print("[red]Список задач пуст.[/red]")
             continue
         else:
             index = ask_task_number(tasks, "Введите номер задачи для удаления: ")
             if index is not None:
                 removed_task = tasks.pop(index)
-                print(f"Задача '{removed_task['title']}' удалена.")
+                console.print(f"[green]Задача '{removed_task['title']}' удалена.[/green]")
 
-    elif choice == "4":
+    elif choice == Action.SHOW_ALL_TASKS:
         if not tasks:
-            print("Список задач пуст.")
+            console.print("[red]Список задач пуст.[/red]")
             continue
         else:
-            print("Список всех задач:")
-            for index, task in enumerate(tasks, start=1):
-                print(
-                    f"{index}. {task['title']} - {'Выполнена' if task['is_done'] else 'Не выполнена'}"
-                )
+            show_tasks(tasks)
 
-    elif choice == "5":
+    elif choice == Action.SHOW_DONE_TASKS:
         if not tasks or not any(task["is_done"] for task in tasks):
-            print("Список выполненных задач пуст.")
+            console.print("[red]Список выполненных задач пуст.[/red]")
             continue
         else:
-            print("Выполненные задачи:")
-            for index, task in enumerate(tasks, start=1):
-                if task["is_done"]:
-                    print(f"{index}. {task['title']}")
+            show_tasks(tasks, filter_done=True)
 
-    elif choice == "6":
+    elif choice == Action.SHOW_NOT_DONE_TASKS:
         if not tasks or not any(not task["is_done"] for task in tasks):
-            print("Список невыполненных задач пуст.")
+            console.print("[red]Список невыполненных задач пуст.[/red]")
             continue
         else:
-            print("Невыполненные задачи:")
-            for index, task in enumerate(tasks, start=1):
-                if not task["is_done"]:
-                    print(f"{index}. {task['title']}")
+            show_tasks(tasks, filter_done=False)
 
-    elif choice == "7":
-        print("Выход из программы.")
+    elif choice == Action.EXIT:
+        console.print("[green]Выход из программы.[/green]")
         is_running = False
-
-    else:
-        print("Неизвестный пункт меню, выберите от 1 до 7.")
