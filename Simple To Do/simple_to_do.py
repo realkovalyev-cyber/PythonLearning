@@ -68,6 +68,27 @@ def add_task(task_list):
         console.print(f"[green]Задача '{escape(title)}' добавлена под номером {len(task_list)}.[/green]")
 
 
+def mark_task_done(task_list):
+    if not task_list:
+        console.print("[red]Список задач пуст. Нечего отмечать как выполненное.[/red]")
+        return
+
+    if not any(not task["is_done"] for task in task_list):
+        console.print("[yellow]Все задачи уже выполнены.[/yellow]")
+        return
+
+    task_index = ask_task_number(task_list, "Введите номер задачи для отметки как выполненной: ")
+    if task_index is None:
+        return
+
+    marked_task = task_list[task_index]
+    if marked_task["is_done"]:
+        console.print(f"[yellow]Задача '{escape(marked_task['title'])}' уже выполнена.[/yellow]")
+    else:
+        marked_task["is_done"] = True
+        console.print(f"[green]Задача '{escape(marked_task['title'])}' отмечена как выполненная.[/green]")
+
+
 def delete_task(task_list):
     if not task_list:
         console.print("[red]Список задач пуст. Нечего удалять.[/red]")
@@ -103,6 +124,30 @@ def show_tasks(task_list, filter_done=None):
     console.print(table)
 
 
+def show_all_tasks(task_list):
+    if not task_list:
+        console.print("[red]Список задач пуст.[/red]")
+        return
+
+    show_tasks(task_list)
+
+
+def show_done_tasks(task_list):
+    if not any(task["is_done"] for task in task_list):
+        console.print("[red]Список выполненных задач пуст.[/red]")
+        return
+
+    show_tasks(task_list, filter_done=True)
+
+
+def show_not_done_tasks(task_list):
+    if not any(not task["is_done"] for task in task_list):
+        console.print("[red]Список невыполненных задач пуст.[/red]")
+        return
+
+    show_tasks(task_list, filter_done=False)
+
+
 try:
     while is_running:
         choice = show_menu()
@@ -111,47 +156,19 @@ try:
             add_task(tasks)
 
         elif choice == Action.MARK_DONE:
-            if not tasks:
-                console.print("[red]Список задач пуст.[/red]")
-                continue
-
-            index = ask_task_number(
-                tasks, "Введите номер задачи для отметки как выполненной: "
-            )
-            if index is None:
-                continue
-
-            task = tasks[index]
-            if task["is_done"]:
-                console.print(f"[yellow]Задача '{escape(task['title'])}' уже выполнена.[/yellow]")
-                continue
-
-            task["is_done"] = True
-            console.print(f"[green]Задача '{escape(task['title'])}' отмечена как выполненная.[/green]")
+            mark_task_done(tasks)
 
         elif choice == Action.DELETE_TASK:
             delete_task(tasks)
 
         elif choice == Action.SHOW_ALL_TASKS:
-            if not tasks:
-                console.print("[red]Список задач пуст.[/red]")
-                continue
-
-            show_tasks(tasks)
+            show_all_tasks(tasks)
 
         elif choice == Action.SHOW_DONE_TASKS:
-            if not any(task["is_done"] for task in tasks):
-                console.print("[red]Список выполненных задач пуст.[/red]")
-                continue
-
-            show_tasks(tasks, filter_done=True)
+            show_done_tasks(tasks)
 
         elif choice == Action.SHOW_NOT_DONE_TASKS:
-            if not any(not task["is_done"] for task in tasks):
-                console.print("[red]Список невыполненных задач пуст.[/red]")
-                continue
-
-            show_tasks(tasks, filter_done=False)
+            show_not_done_tasks(tasks)
 
         elif choice == Action.EXIT:
             console.print("[green]Выход из программы.[/green]")
