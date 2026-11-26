@@ -68,6 +68,19 @@ def add_task(task_list):
         console.print(f"[green]Задача '{escape(title)}' добавлена под номером {len(task_list)}.[/green]")
 
 
+def delete_task(task_list):
+    if not task_list:
+        console.print("[red]Список задач пуст. Нечего удалять.[/red]")
+        return
+
+    task_index = ask_task_number(task_list, "Введите номер задачи для удаления: ")
+    if task_index is None:
+        return
+
+    deleted_task = task_list.pop(task_index)
+    console.print(f"[green]Задача '{escape(deleted_task['title'])}' удалена.[/green]")
+
+
 def show_tasks(task_list, filter_done=None):
     """Нумерация до фильтрации, чтобы сохранить правильные номера задач для пользователя."""
     table = Table(
@@ -117,14 +130,7 @@ try:
             console.print(f"[green]Задача '{escape(task['title'])}' отмечена как выполненная.[/green]")
 
         elif choice == Action.DELETE_TASK:
-            if not tasks:
-                console.print("[red]Список задач пуст.[/red]")
-                continue
-
-            index = ask_task_number(tasks, "Введите номер задачи для удаления: ")
-            if index is not None:
-                removed_task = tasks.pop(index)
-                console.print(f"[green]Задача '{escape(removed_task['title'])}' удалена.[/green]")
+            delete_task(tasks)
 
         elif choice == Action.SHOW_ALL_TASKS:
             if not tasks:
