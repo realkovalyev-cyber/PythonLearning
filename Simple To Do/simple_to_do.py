@@ -53,9 +53,11 @@ def ask_task_number(task_list, prompt):
     except ValueError:
         console.print("[red]Некорректный ввод. Нужно ввести число.[/red]")
         return None
+
     if task_number < 1 or task_number > len(task_list):
         console.print(f"[red]Задача с номером {task_number} не найдена.[/red]")
         return None
+
     return task_number - 1
 
 
