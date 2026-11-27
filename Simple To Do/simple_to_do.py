@@ -150,35 +150,38 @@ def show_not_done_tasks(task_list):
     show_tasks(task_list, filter_done=False)
 
 
+def exit_program(task_list):
+    global is_running
+    if not task_list:
+        console.print("[yellow]Список задач пуст. Выход из программы.[/yellow]")
+    else:
+        console.print("[yellow]Выход из программы. Все несохраненные данные будут потеряны.[/yellow]")
+    is_running = False
+
+
+ACTIONS = {
+    Action.ADD_TASK: add_task,
+    Action.MARK_DONE: mark_task_done,
+    Action.DELETE_TASK: delete_task,
+    Action.SHOW_ALL_TASKS: show_all_tasks,
+    Action.SHOW_DONE_TASKS: show_done_tasks,
+    Action.SHOW_NOT_DONE_TASKS: show_not_done_tasks,
+    Action.EXIT: exit_program
+}
+
 try:
     while is_running:
         choice = show_menu()
 
-        if choice == Action.ADD_TASK:
-            add_task(tasks)
-
-        elif choice == Action.MARK_DONE:
-            mark_task_done(tasks)
-
-        elif choice == Action.DELETE_TASK:
-            delete_task(tasks)
-
-        elif choice == Action.SHOW_ALL_TASKS:
-            show_all_tasks(tasks)
-
-        elif choice == Action.SHOW_DONE_TASKS:
-            show_done_tasks(tasks)
-
-        elif choice == Action.SHOW_NOT_DONE_TASKS:
-            show_not_done_tasks(tasks)
-
-        elif choice == Action.EXIT:
-            console.print("[green]Выход из программы.[/green]")
+        if choice is None:  # Пользователь нажал Ctrl+C
+            console.print("[red]Выход по Ctrl+C.[/red]")
             is_running = False
 
-        elif choice is None:
-            console.print("[red]Отменено пользователем. Выход из программы.[/red]")
-            is_running = False
+        elif choice in ACTIONS:
+            ACTIONS[choice](tasks)
+
+        else:
+            console.print("[red]Некорректный выбор действия.[/red]")
 
 except KeyboardInterrupt:
-    console.print("[red]Программа завершена пользователем.[/red]")
+    console.print("[red]Выход по Ctrl+C.[/red]")
